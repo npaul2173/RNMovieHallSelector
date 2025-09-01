@@ -14,6 +14,8 @@ import {
 } from 'react-native';
 import Animated, { useSharedValue, withSpring } from 'react-native-reanimated';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { MovieHall } from './src/MovieHall';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 function App() {
   const isDarkMode = useColorScheme() === 'dark';
@@ -34,8 +36,8 @@ function AppContent() {
   };
 
   return (
-    <View style={styles.container}>
-      <View>
+    <GestureHandlerRootView>
+      {/* <View>
         <Animated.View
           style={{
             width,
@@ -44,8 +46,9 @@ function AppContent() {
           }}
         />
       </View>
-      <Button onPress={handlePress} title="Click me" />
-    </View>
+      <Button onPress={handlePress} title="Click me" /> */}
+      <MovieHall />
+    </GestureHandlerRootView>
   );
 }
 
