@@ -1,3 +1,4 @@
+import { useEffect, useRef, useState } from 'react';
 import {
   Dimensions,
   findNodeHandle,
@@ -12,14 +13,14 @@ import Animated, {
   useAnimatedStyle,
   useSharedValue,
 } from 'react-native-reanimated';
-import Seat from '../../assets/svgs/Seat.svg';
-import { useEffect, useRef, useState } from 'react';
+import { SeatMap } from './SeatMap';
+import { movieHallStructure } from './constants';
+import { Header, HEADER_HEIGHT } from './Header';
 import ScreenViewPlaceholder from './ScreenViewPlaceholder';
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 const PADDING = 40;
 const MAP_WIDTH = 1000;
 const MAP_HEIGHT = 1000;
-const arr = new Array(10).fill(1);
 
 export const MovieHall: React.FC = () => {
   const translateX = useSharedValue(0);
@@ -29,6 +30,8 @@ export const MovieHall: React.FC = () => {
   const startX = useSharedValue(0);
   const startY = useSharedValue(0);
   const mapRef = useRef<View>(null);
+  const scale = useSharedValue(1); // 🔑 zoom
+  const startScale = useSharedValue(1);
 
   const panGesture = Gesture.Pan()
     .onStart(() => {
@@ -55,6 +58,7 @@ export const MovieHall: React.FC = () => {
     transform: [
       { translateX: translateX.value },
       { translateY: translateY.value },
+      { scale: scale.value },
     ],
   }));
 
@@ -75,9 +79,23 @@ export const MovieHall: React.FC = () => {
   }, []);
   console.log({ mapWidth, mapHeight });
 
+  // 🔍 Pinch gesture for zoom
+  const pinchGesture = Gesture.Pinch()
+    .onStart(() => {
+      startScale.value = scale.value;
+    })
+    .onUpdate(event => {
+      let nextScale = startScale.value * event.scale;
+      // Clamp zoom between 0.5x and 3x
+      scale.value = Math.min(Math.max(nextScale, 0.5), 3);
+    });
+
+  const composed = Gesture.Simultaneous(panGesture, pinchGesture);
+
   return (
     <View style={styles.container}>
-      <GestureDetector gesture={panGesture}>
+      <Header />
+      <GestureDetector gesture={composed}>
         <Animated.View
           ref={mapRef}
           style={[
@@ -86,8 +104,10 @@ export const MovieHall: React.FC = () => {
             { width: mapWidth, height: mapHeight },
           ]}
         >
+          <ScreenViewPlaceholder />
+          <SeatMap data={movieHallStructure} />
           {/* Render your seats here */}
-          {arr.map((_, index) => {
+          {/* {arr.map((_, index) => {
             return (
               <View style={{ flexDirection: 'row', padding: 10 }} key={index}>
                 {arr.map((_, ind) => {
@@ -98,9 +118,7 @@ export const MovieHall: React.FC = () => {
                 })}
               </View>
             );
-          })}
-
-          <ScreenViewPlaceholder />
+          })} */}
         </Animated.View>
       </GestureDetector>
 
@@ -117,6 +135,8 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: PADDING,
+    paddingTop: PADDING + HEADER_HEIGHT,
+    // backgroundColor: 'black',
     backgroundColor: 'rgba(28, 28, 28, 1)',
   },
   buttonContainer: {

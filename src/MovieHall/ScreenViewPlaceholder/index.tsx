@@ -1,15 +1,7 @@
 /* eslint-disable react/self-closing-comp */
 /* eslint-disable react-native/no-inline-styles */
-import MaskedView from '@react-native-masked-view/masked-view';
 import React, { useEffect, useRef } from 'react';
-import { Animated, View } from 'react-native';
-import {
-  Easing,
-  useAnimatedStyle,
-  useSharedValue,
-  withRepeat,
-  withTiming,
-} from 'react-native-reanimated';
+import { View } from 'react-native';
 import Video, { VideoRef } from 'react-native-video';
 
 const FACTOR = 30;
@@ -17,92 +9,69 @@ const VIDEO_HEIGHT = 9 * FACTOR;
 const VIDEO_WIDTH = 16 * FACTOR;
 
 const ScreenViewPlaceholder = () => {
-  // Define trapezium points
-  // const topWidth = width * 0.6; // top width smaller
-  // const bottomWidth = width * 0.9; // bottom width larger
-  // const height = VIDEO_HEIGHT;
   const videoRef = useRef<VideoRef>(null);
-  const rotateX = useSharedValue(70); // initial rotateX in degrees
-
-  // const path = `
-  //   M ${(width - topWidth) / 2} 0
-  //   L ${(width + topWidth) / 2} 0
-  //   L ${(width + bottomWidth) / 2} ${height}
-  //   L ${(width - bottomWidth) / 2} ${height}
-  //   Z
-  // `;
-  const background = require('../../../assets/videos/videoSample2.mp4');
-
-  rotateX.value = withRepeat(
-    withTiming(60, {
-      duration: 5000,
-      easing: Easing.inOut(Easing.ease),
-    }),
-    -1,
-    true, // reverse
-  );
-
-  const animatedStyle = useAnimatedStyle(() => ({
-    transform: [{ perspective: 800 }, { rotateX: `${rotateX.value}deg` }],
-  }));
-  console.log(animatedStyle);
+  const videoRef2 = useRef<VideoRef>(null);
+  const background = require('../../../assets/videos/supermanTrailerCopy.mp4');
 
   useEffect(() => {
     setTimeout(() => {
       const goTo10Seconds = () => {
-        if (videoRef.current) {
+        if (videoRef.current && videoRef2.current) {
           videoRef.current.seek(93); // seek to 10 seconds
+          videoRef2.current.seek(93); // seek to 10 seconds
         }
       };
       goTo10Seconds();
-      videoRef.current?.pause();
+      // videoRef.current?.pause();
+      // videoRef2.current?.pause();
     }, 100);
   }, []);
 
   return (
-    <Animated.View
+    <View
       style={{
-        height: VIDEO_HEIGHT,
-        width: VIDEO_WIDTH,
-        // transform: [
-        //   { perspective: 800 }, // Required for 3D
-        //   { rotateX: '70deg' }, // Tilt forward/back
-        //  ],
-        ...animatedStyle,
+        height: VIDEO_HEIGHT + 50,
+        width: VIDEO_WIDTH + 50,
+        justifyContent: 'center',
+        alignItems: 'center',
       }}
     >
-      <MaskedView
+      <View
         style={{
-          flex: 1,
-          flexDirection: 'row',
-          height: '100%',
-          backgroundColor: 'red',
-          overflow: 'hidden', // <-- Add this
+          backgroundColor: '#373737ff',
+          position: 'absolute',
+          height: VIDEO_HEIGHT + 20,
+          width: VIDEO_WIDTH + 20,
+          transform: [
+            { perspective: 800 }, // Required for 3D
+            { rotateX: '-50deg' }, // Tilt forward/back
+          ],
         }}
-        maskElement={
-          <View
-            style={{
-              height: VIDEO_HEIGHT,
-              width: VIDEO_WIDTH,
-            }}
-          ></View>
-        }
-        // style={{ height }}
-        // maskElement={
-        //   <Svg width={width} height={height}>
-        //     <Path d={path} fill="black" />
-        //   </Svg>
-        // }
+      />
+      <View
+        style={{
+          position: 'absolute',
+
+          height: VIDEO_HEIGHT,
+          width: VIDEO_WIDTH,
+          transform: [
+            { perspective: 800 }, // Required for 3D
+            { rotateX: '-50deg' }, // Tilt forward/back
+          ],
+        }}
       >
         <Video
+          muted
           ref={videoRef}
+          playInBackground
           source={background}
+          mixWithOthers="mix"
           style={{ width: VIDEO_WIDTH, height: VIDEO_HEIGHT }}
           resizeMode="cover"
           repeat
         />
-      </MaskedView>
-    </Animated.View>
+      </View>
+    </View>
   );
 };
 
