@@ -19,12 +19,20 @@ import { Header, HEADER_HEIGHT } from './Header';
 import ScreenViewPlaceholder from './ScreenViewPlaceholder';
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 const PADDING = 40;
-const MAP_WIDTH = 1000;
-const MAP_HEIGHT = 1000;
+const MAP_WIDTH = 1500;
+const MAP_HEIGHT = 1800;
+
+const rowIds = movieHallStructure.sections.flatMap(section =>
+  section.rows.map(row => row.id),
+);
+console.log('ROWS ID', rowIds);
 
 export const MovieHall: React.FC = () => {
   const translateX = useSharedValue(0);
   const translateY = useSharedValue(0);
+
+  console.log(translateX.value, translateY.value);
+
   const [mapWidth, setMapWidth] = useState(MAP_WIDTH);
   const [mapHeight, setMapHeight] = useState(MAP_HEIGHT);
   const startX = useSharedValue(0);
@@ -87,7 +95,7 @@ export const MovieHall: React.FC = () => {
     .onUpdate(event => {
       let nextScale = startScale.value * event.scale;
       // Clamp zoom between 0.5x and 3x
-      scale.value = Math.min(Math.max(nextScale, 0.5), 3);
+      scale.value = Math.min(Math.max(nextScale, 0.5), 2);
     });
 
   const composed = Gesture.Simultaneous(panGesture, pinchGesture);
@@ -105,7 +113,50 @@ export const MovieHall: React.FC = () => {
           ]}
         >
           <ScreenViewPlaceholder />
-          <SeatMap data={movieHallStructure} />
+          <View
+            style={{
+              flexDirection: 'row',
+              justifyContent: 'flex-start',
+              alignItems: 'flex-start',
+              gap: 10,
+            }}
+          >
+            <View
+              style={{
+                gap: 160,
+                paddingTop: 60,
+                flexDirection: 'column-reverse',
+                backgroundColor: '#333333',
+                borderRadius: 5,
+                paddingHorizontal: 10,
+              }}
+            >
+              {movieHallStructure.sections.map((sec, secIndex) => {
+                return (
+                  <View key={secIndex} style={{ gap: 10 }}>
+                    {sec.rows.map((row, rowIndex) => {
+                      return (
+                        <View
+                          style={{
+                            width: 40,
+                            height: 40,
+                            borderRadius: 5,
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                            backgroundColor: '#444444',
+                          }}
+                          key={rowIndex}
+                        >
+                          <Text style={{ color: 'white' }}>{row.id}</Text>
+                        </View>
+                      );
+                    })}
+                  </View>
+                );
+              })}
+            </View>
+            <SeatMap data={movieHallStructure} />
+          </View>
           {/* Render your seats here */}
           {/* {arr.map((_, index) => {
             return (

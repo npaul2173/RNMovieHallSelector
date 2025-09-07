@@ -5,7 +5,7 @@ export const Header: React.FC = () => {
   return (
     <View style={styles.container}>
       <View>
-        <Text style={styles.title}>The Conjuring: Last Rites </Text>
+        <Text style={styles.title}>Superman 2025</Text>
         <Text style={styles.description}>PVR:Diamond plaza, New work </Text>
       </View>
     </View>
