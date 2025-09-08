@@ -1,9 +1,13 @@
-import { StyleSheet, Text, View } from 'react-native';
+import { Dimensions, StyleSheet, Text, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-export const HEADER_HEIGHT = 80;
+const { width } = Dimensions.get('screen');
+export const HEADER_HEIGHT = 100;
 export const Header: React.FC = () => {
+  const insets = useSafeAreaInsets();
+
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { paddingTop: insets.top }]}>
       <View>
         <Text style={styles.title}>Superman 2025</Text>
         <Text style={styles.description}>PVR:Diamond plaza, New work </Text>
@@ -15,7 +19,9 @@ export const Header: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     height: HEADER_HEIGHT,
-    width: 500,
+    // width: 500,
+    // width: '100%',
+    width,
     backgroundColor: 'black',
     position: 'absolute',
     zIndex: 200,

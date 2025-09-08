@@ -1,12 +1,15 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import {
   Dimensions,
   findNodeHandle,
   Pressable,
+  StatusBar,
+  StyleProp,
   StyleSheet,
   Text,
   UIManager,
   View,
+  ViewStyle,
 } from 'react-native';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import Animated, {
@@ -17,21 +20,22 @@ import { SeatMap } from './SeatMap';
 import { movieHallStructure } from './constants';
 import { Header, HEADER_HEIGHT } from './Header';
 import ScreenViewPlaceholder from './ScreenViewPlaceholder';
+import { LevelView } from './LevelView';
+import {
+  SafeAreaView,
+  useSafeAreaInsets,
+} from 'react-native-safe-area-context';
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 const PADDING = 40;
 const MAP_WIDTH = 1500;
 const MAP_HEIGHT = 1800;
 
-const rowIds = movieHallStructure.sections.flatMap(section =>
-  section.rows.map(row => row.id),
-);
-console.log('ROWS ID', rowIds);
-
 export const MovieHall: React.FC = () => {
-  const translateX = useSharedValue(0);
-  const translateY = useSharedValue(0);
+  const translateX = useSharedValue(-500);
+  const translateY = useSharedValue(-300);
+  const insets = useSafeAreaInsets();
 
-  console.log(translateX.value, translateY.value);
+  console.log(translateX.value, translateY.value, insets);
 
   const [mapWidth, setMapWidth] = useState(MAP_WIDTH);
   const [mapHeight, setMapHeight] = useState(MAP_HEIGHT);
@@ -95,14 +99,23 @@ export const MovieHall: React.FC = () => {
     .onUpdate(event => {
       let nextScale = startScale.value * event.scale;
       // Clamp zoom between 0.5x and 3x
-      scale.value = Math.min(Math.max(nextScale, 0.5), 2);
+      scale.value = Math.min(Math.max(nextScale, 0.5), 1);
     });
 
   const composed = Gesture.Simultaneous(panGesture, pinchGesture);
 
+  const containerStyles: StyleProp<ViewStyle> = useMemo(
+    () => [
+      styles.container,
+      { backgroundColor: 'red', padddingBottom: insets.bottom },
+    ],
+    [insets.bottom],
+  );
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={containerStyles} edges={['top', 'left', 'right']}>
+      <StatusBar backgroundColor={'black'} barStyle={'light-content'} />
       <Header />
+
       <GestureDetector gesture={composed}>
         <Animated.View
           ref={mapRef}
@@ -113,63 +126,10 @@ export const MovieHall: React.FC = () => {
           ]}
         >
           <ScreenViewPlaceholder />
-          <View
-            style={{
-              flexDirection: 'row',
-              justifyContent: 'flex-start',
-              alignItems: 'flex-start',
-              gap: 10,
-            }}
-          >
-            <View
-              style={{
-                gap: 160,
-                paddingTop: 60,
-                flexDirection: 'column-reverse',
-                backgroundColor: '#333333',
-                borderRadius: 5,
-                paddingHorizontal: 10,
-              }}
-            >
-              {movieHallStructure.sections.map((sec, secIndex) => {
-                return (
-                  <View key={secIndex} style={{ gap: 10 }}>
-                    {sec.rows.map((row, rowIndex) => {
-                      return (
-                        <View
-                          style={{
-                            width: 40,
-                            height: 40,
-                            borderRadius: 5,
-                            justifyContent: 'center',
-                            alignItems: 'center',
-                            backgroundColor: '#444444',
-                          }}
-                          key={rowIndex}
-                        >
-                          <Text style={{ color: 'white' }}>{row.id}</Text>
-                        </View>
-                      );
-                    })}
-                  </View>
-                );
-              })}
-            </View>
+          <View style={styles.seatsContainer}>
+            <LevelView data={movieHallStructure} />
             <SeatMap data={movieHallStructure} />
           </View>
-          {/* Render your seats here */}
-          {/* {arr.map((_, index) => {
-            return (
-              <View style={{ flexDirection: 'row', padding: 10 }} key={index}>
-                {arr.map((_, ind) => {
-                  // return <View key={ind} style={styles.seat} />;
-                  return (
-                    <Seat height={40} width={40} color={'#1D2626'} key={ind} />
-                  );
-                })}
-              </View>
-            );
-          })} */}
         </Animated.View>
       </GestureDetector>
 
@@ -178,7 +138,7 @@ export const MovieHall: React.FC = () => {
           <Text style={{ color: 'white' }}>PAY</Text>
         </Pressable>
       </View>
-    </View>
+    </SafeAreaView>
   );
 };
 
@@ -212,10 +172,10 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     justifyContent: 'center',
   },
-  seat: {
-    width: 40,
-    height: 40,
-    margin: 10,
-    backgroundColor: '#494949ff',
+  seatsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'flex-start',
+    alignItems: 'flex-start',
+    gap: 10,
   },
 });

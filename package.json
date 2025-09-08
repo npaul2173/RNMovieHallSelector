@@ -11,10 +11,12 @@
   },
   "dependencies": {
     "@react-native-masked-view/masked-view": "^0.3.2",
+    "@react-native-vector-icons/ant-design": "^12.3.0",
     "@react-native/new-app-screen": "0.81.0",
     "react": "19.1.0",
     "react-native": "0.81.0",
     "react-native-gesture-handler": "^2.28.0",
+    "react-native-nitro-modules": "^0.29.3",
     "react-native-reanimated": "^4.0.2",
     "react-native-safe-area-context": "^5.5.2",
     "react-native-svg": "^15.12.1",
