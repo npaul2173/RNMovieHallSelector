@@ -65,13 +65,12 @@ export const MovieHall: React.FC = () => {
       translateY.value = Math.min(Math.max(nextY, minY), maxY);
     });
 
-  const levelContainerStyles = useAnimatedStyle(() => ({
-    position: 'absolute',
-    zIndex: 200,
+  const levelViewStyle = useAnimatedStyle(() => ({
     transform: [
+      { scale: scale.value }, // ✅ follow zoom
       {
-        translateY: 100,
-      },
+        translateY: translateY.value / scale.value + 575 / scale.value,
+      }, // ✅ compensate
     ],
   }));
 
@@ -100,14 +99,12 @@ export const MovieHall: React.FC = () => {
   }, []);
   console.log({ mapWidth, mapHeight });
 
-  // 🔍 Pinch gesture for zoom
   const pinchGesture = Gesture.Pinch()
     .onStart(() => {
       startScale.value = scale.value;
     })
     .onUpdate(event => {
       let nextScale = startScale.value * event.scale;
-      // Clamp zoom between 0.5x and 3x
       scale.value = Math.min(Math.max(nextScale, 0.5), 1);
     });
 
@@ -134,19 +131,11 @@ export const MovieHall: React.FC = () => {
         >
           <ScreenViewPlaceholder />
           <View style={styles.seatsContainer}>
-            <LevelView
-              levelStyles={levelContainerStyles}
-              data={movieHallStructure}
-            />
-
             <SeatMap data={movieHallStructure} />
           </View>
         </Animated.View>
       </GestureDetector>
-      {/* <Animated.View style={levelContainerStyles}>
-        <LevelView data={movieHallStructure} />
-      </Animated.View> */}
-
+      <LevelView levelStyles={levelViewStyle} data={movieHallStructure} />
       <Footer />
     </SafeAreaView>
   );
