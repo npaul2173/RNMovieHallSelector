@@ -1,6 +1,7 @@
 export interface SeatProps {
   id: string; // unique seat identifier (e.g., "A1", "X100X")
   seat: string | null; // visible label OR null for gap/empty space
+  isSold: boolean;
 }
 
 export interface RowProps {
@@ -12,6 +13,7 @@ export interface Section {
   id: string; // section identifier (e.g., "SEC100")
   name: string; // section name (e.g., "Recliner")
   rows: RowProps[]; // list of rows inside this section
+  price: number;
 }
 
 export interface MovieHallStructure {

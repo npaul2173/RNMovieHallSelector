@@ -2,11 +2,9 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import {
   Dimensions,
   findNodeHandle,
-  Pressable,
   StatusBar,
   StyleProp,
   StyleSheet,
-  Text,
   UIManager,
   View,
   ViewStyle,
@@ -16,15 +14,16 @@ import Animated, {
   useAnimatedStyle,
   useSharedValue,
 } from 'react-native-reanimated';
-import { SeatMap } from './SeatMap';
-import { movieHallStructure } from './constants';
-import { Header, HEADER_HEIGHT } from './Header';
-import ScreenViewPlaceholder from './ScreenViewPlaceholder';
-import { LevelView } from './LevelView';
 import {
   SafeAreaView,
   useSafeAreaInsets,
 } from 'react-native-safe-area-context';
+import { movieHallStructure } from './constants';
+import { Footer } from './Footer';
+import { Header, HEADER_HEIGHT } from './Header';
+import { LevelView } from './LevelView';
+import ScreenViewPlaceholder from './ScreenViewPlaceholder';
+import { SeatMap } from './SeatMap';
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 const PADDING = 40;
 const MAP_WIDTH = 1500;
@@ -66,6 +65,16 @@ export const MovieHall: React.FC = () => {
       translateY.value = Math.min(Math.max(nextY, minY), maxY);
     });
 
+  const levelContainerStyles = useAnimatedStyle(() => ({
+    position: 'absolute',
+    zIndex: 200,
+    transform: [
+      {
+        translateY: 100,
+      },
+    ],
+  }));
+
   const animatedStyle = useAnimatedStyle(() => ({
     transform: [
       { translateX: translateX.value },
@@ -105,12 +114,10 @@ export const MovieHall: React.FC = () => {
   const composed = Gesture.Simultaneous(panGesture, pinchGesture);
 
   const containerStyles: StyleProp<ViewStyle> = useMemo(
-    () => [
-      styles.container,
-      { backgroundColor: 'red', padddingBottom: insets.bottom },
-    ],
+    () => ({ padddingBottom: insets.bottom, ...styles.container }),
     [insets.bottom],
   );
+
   return (
     <SafeAreaView style={containerStyles} edges={['top', 'left', 'right']}>
       <StatusBar backgroundColor={'black'} barStyle={'light-content'} />
@@ -127,17 +134,20 @@ export const MovieHall: React.FC = () => {
         >
           <ScreenViewPlaceholder />
           <View style={styles.seatsContainer}>
-            <LevelView data={movieHallStructure} />
+            <LevelView
+              levelStyles={levelContainerStyles}
+              data={movieHallStructure}
+            />
+
             <SeatMap data={movieHallStructure} />
           </View>
         </Animated.View>
       </GestureDetector>
+      {/* <Animated.View style={levelContainerStyles}>
+        <LevelView data={movieHallStructure} />
+      </Animated.View> */}
 
-      <View style={styles.buttonContainer}>
-        <Pressable style={styles.continueButton}>
-          <Text style={{ color: 'white' }}>PAY</Text>
-        </Pressable>
-      </View>
+      <Footer />
     </SafeAreaView>
   );
 };

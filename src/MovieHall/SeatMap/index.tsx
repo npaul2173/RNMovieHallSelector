@@ -8,7 +8,7 @@ export const SeatMap: React.FC<{ data: MovieHallStructure }> = ({ data }) => {
         {data.sections.map((section, sectionIndex) => {
           return (
             <View key={sectionIndex} style={styles.sectionContainer}>
-              <View style={{ padding: 20 }}>
+              <View style={styles.sectionTextContainer}>
                 <Text style={styles.section}> Section {section.name} </Text>
               </View>
 
@@ -19,7 +19,13 @@ export const SeatMap: React.FC<{ data: MovieHallStructure }> = ({ data }) => {
                     <View key={rowIndex} style={styles.rowContainer}>
                       {/* SEATS */}
                       {row.seats.map((seat, seatIndex) => {
-                        return <SeatView key={seatIndex} data={seat} />;
+                        return (
+                          <SeatView
+                            key={seatIndex}
+                            data={seat}
+                            isIcon={false}
+                          />
+                        );
                       })}
                     </View>
                   );
@@ -48,6 +54,9 @@ const styles = StyleSheet.create({
   sectionContainer: {
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  sectionTextContainer: {
+    padding: 20,
   },
   sectionRowContainer: {
     // backgroundColor: '#999999',

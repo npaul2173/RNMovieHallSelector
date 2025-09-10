@@ -1,17 +1,28 @@
 import { Text, View } from 'react-native';
 import { MovieHallStructure } from '../types';
+import Animated from 'react-native-reanimated';
 
-export const LevelView: React.FC<{ data: MovieHallStructure }> = ({ data }) => {
+export const LevelView: React.FC<{
+  data: MovieHallStructure;
+  levelStyles: any;
+}> = ({ data, levelStyles }) => {
+  console.log('levelStyles', levelStyles);
+
   return (
-    <View
-      style={{
-        gap: 160,
-        paddingTop: 60,
-        flexDirection: 'column-reverse',
-        backgroundColor: '#333333',
-        borderRadius: 5,
-        paddingHorizontal: 10,
-      }}
+    <Animated.View
+      style={[
+        levelStyles,
+        {
+          gap: 160,
+          paddingTop: 60,
+          flexDirection: 'column-reverse',
+          backgroundColor: '#333333',
+          borderRadius: 5,
+          paddingHorizontal: 10,
+          // zIndex: 200,
+          // left: 16,
+        },
+      ]}
     >
       {data.sections.map((sec, secIndex) => {
         return (
@@ -36,6 +47,6 @@ export const LevelView: React.FC<{ data: MovieHallStructure }> = ({ data }) => {
           </View>
         );
       })}
-    </View>
+    </Animated.View>
   );
 };

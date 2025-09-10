@@ -70,7 +70,7 @@ const ScreenViewPlaceholder = () => {
           }}
         >
           <Video
-            // muted
+            muted
             controls={false}
             ref={videoRef}
             // playInBackground
